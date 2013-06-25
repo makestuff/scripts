@@ -15,12 +15,39 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #!/bin/bash
-if [ $# != 1 ]; then
-	echo "$0 <repo>"
+
+function usage {
+	echo "Synopsis: $0 <user>/<repo>[/<branch>]" 1>&2
+	echo "  <user>   - the github.com user (required)" 1>&2
+	echo "  <repo>   - the github.com repository (required)" 1>&2
+	echo "  <branch> - the git branch to fetch (default: \"${BRANCH}\")" 1>&2
+	exit 1
+}
+
+if [ $# -ne 1 ]; then
+	usage
+fi
+
+OLDIFS=${IFS}
+IFS='/'
+TOKENS=($1)
+IFS=${OLDIFS}
+NUMTOK=${#TOKENS[@]}
+if [ "$NUMTOK" == "2" ]; then
+	USER=${TOKENS[0]}
+	REPO=${TOKENS[1]}
+	BRANCH=master
+elif [ "$NUMTOK" == "3" ]; then
+	USER=${TOKENS[0]}
+	REPO=${TOKENS[1]}
+	BRANCH=${TOKENS[2]}
+else
+	usage
+fi
+
+if [ -e ${REPO} ]; then
+	echo "Repository \"${REPO}\" already exists" 1>&2
 	exit 1
 fi
-if [ -e ${1} ]; then
-	echo "$1 already exists"
-	exit 1
-fi
-git clone git@github.com:makestuff/${1}.git ${1}
+
+git clone -b ${BRANCH} git@github.com:${USER}/${REPO}.git ${REPO}
