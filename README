@@ -11,3 +11,6 @@ msgit.sh:
 
 gendox:
   Build Doxygen HTML from a single library header file.
+
+lsrepo.py:
+  Use the GitHub API to fetch a list of repos with their branches.
