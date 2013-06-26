@@ -1,1 +1,13 @@
-Top-level includes, stuff that almost everything else needs.
+Various useful scripts in various languages.
+
+make-build-infra.sh:
+  Create the Windows/Unix build infrastructure.
+
+msget.sh:
+  Get a read-only branch of a GitHub repository.
+
+msgit.sh:
+  Get a clone of a branch of a GitHub repository.
+
+gendox:
+  Build Doxygen HTML from a single library header file.

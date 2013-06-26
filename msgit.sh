@@ -36,7 +36,7 @@ NUMTOK=${#TOKENS[@]}
 if [ "$NUMTOK" == "2" ]; then
 	USER=${TOKENS[0]}
 	REPO=${TOKENS[1]}
-	BRANCH=master
+	BRANCH=dev
 elif [ "$NUMTOK" == "3" ]; then
 	USER=${TOKENS[0]}
 	REPO=${TOKENS[1]}
