@@ -98,8 +98,8 @@ There are four subdirectories here:
   scripts - A few useful scripts.
 
 Once you've installed the infrastructure in a convenient location of your choice
-(e.g NATIVE_LOC), you can then fetch and build some application code
-from GitHub:
+(e.g NATIVE_LOC), you can then fetch and build some application code from
+GitHub:
 
   cd BASH_LOC/apps
   ../scripts/msget.sh makestuff/lsep
@@ -145,9 +145,9 @@ another of the remote branches you can do it with:
 Have fun!
 EOF
 
-cat $MAIN_README | sed 's/NATIVE_LOC/C:\/makestuff/g;s/BASH_LOC/\/c\/makestuff/g' >> ../README
+cat $MAIN_README | sed 's/NATIVE_LOC/C:\/makestuff/g;s/BASH_LOC/\/c\/makestuff/g' >> ../README.txt
 
-cat >> ../README <<EOF
+cat >> ../README.txt <<EOF
 
 
 WINDOWS MSYS ENVIRONMENT
@@ -183,6 +183,8 @@ You can find details here:
 
 If you need a text editor, you can run /c/makestuff/scripts/getvim.sh.
 EOF
+unix2dos ../README.txt
+
 cp unpack/7za.exe ../msys/bin/
 cp unpack/bin/bunzip2.exe ../msys/bin/
 cp unpack/bin/bzip2.exe ../msys/bin/
@@ -231,11 +233,12 @@ cp ../msg*.sh scripts/
 cd ..
 
 # Zip Windows build and publish it:
-zip -r makestuff-win32-${DATE}.zip makestuff
-mv makestuff-win32-${DATE}.zip ${PUBDIR}
+zip -r makestuff-windows-${DATE}.zip makestuff
+mv makestuff-windows-${DATE}.zip ${PUBDIR}
 
 # Remove Windows-only msys dir, zip remainder and publish:
 rm -rf makestuff/msys
+rm -f makestuff/README.txt
 cat $MAIN_README | sed 's/NATIVE_LOC/\$HOME\/makestuff/g;s/BASH_LOC/\$HOME\/makestuff/g' > makestuff/README
 rm -f makestuff/scripts/getvim.sh
 tar zcf makestuff-lindar-${DATE}.tar.gz makestuff
