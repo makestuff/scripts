@@ -169,13 +169,13 @@ In practice you will want to edit C:\makestuff\msys\etc\profile to setup a
 suitable environment. You will also want to run the Visual Studio command-line
 script to pick up the MSVC compiler and tools:
 
-  %comspec% /k "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86 && set MACHINE=x86 && C:\makestuff\msys\bin\sh.exe --login
+  %comspec% /c "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86 && set MACHINE=x86 && C:\makestuff\msys\bin\sh.exe --login
 
 Obviously the name and exact path to vcvarsall.bat will differ from system to
 system. You can usually pass a parameter to the vcvarsall.bat script to choose
 a 64-bit compiler:
 
-  %comspec% /k "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86_amd64 && set MACHINE=x64 && C:\makestuff\msys\bin\sh.exe --login
+  %comspec% /c "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86_amd64 && set MACHINE=x64 && C:\makestuff\msys\bin\sh.exe --login
 
 You can find details here:
 
