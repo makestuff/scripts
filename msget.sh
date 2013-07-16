@@ -20,14 +20,25 @@ function usage {
 	echo "Synopsis: $0 <user>/<repo>[/<branch>]" 1>&2
 	echo "  <user>   - the github.com user (required)" 1>&2
 	echo "  <repo>   - the github.com repository (required)" 1>&2
-	echo "  <branch> - the git branch to fetch (default: \"${BRANCH}\")" 1>&2
+	echo "  <branch> - the git branch to fetch (default: master)" 1>&2
 	exit 1
 }
+
+unset DEPEND_BRANCH
+
+while [ "${1:0:1}" == "-" ]; do
+  OPT=${1:1}
+  case $OPT in
+    d) shift; DEPEND_BRANCH=$1; shift;;
+    *) usage;;
+  esac
+done
 
 if [ $# -ne 1 ]; then
 	usage
 fi
 
+COMMON_USER=makestuff
 OLDIFS=${IFS}
 IFS='/'
 TOKENS=($1)
@@ -61,34 +72,40 @@ fi
 echo "Uncompressing \"${USER}/${REPO}/${BRANCH}\" into \"${REPO}\" directory..."
 tar zxf ${USER}-${REPO}-${BRANCH}.tgz
 mv ${REPO}-${BRANCH} ${REPO}
-echo ${BRANCH} > ${REPO}/.branch
 rm -f ${USER}-${REPO}-${BRANCH}.tgz
 
-TOPDIR=$(dirname $(dirname $0))
-if [ -e ${TOPDIR}/common ]; then
-	if [ -e ${TOPDIR}/common/.branch ]; then
-		COMMON_BRANCH=$(cat ${TOPDIR}/common/.branch)
+if [ -n "${DEPEND_BRANCH}" ]; then
+	BRANCH=${DEPEND_BRANCH}
+fi
+echo ${BRANCH} > ${REPO}/.branch
+
+if [ "${USER}" != "${COMMON_USER}" -o "${REPO}" != "common" ]; then
+	TOPDIR=$(dirname $(dirname $0))
+	if [ -e ${TOPDIR}/common ]; then
+		if [ -e ${TOPDIR}/common/.branch ]; then
+			COMMON_BRANCH=$(cat ${TOPDIR}/common/.branch)
+		else
+			COMMON_BRANCH=dev
+		fi
+		if [ "${COMMON_BRANCH}" != "${BRANCH}" ]; then
+			echo
+			echo "ERROR: A \"${TOPDIR}/common\" directory exists, but it's on the ${COMMON_BRANCH} branch. You" 2>&1
+			echo "       should not try to mix different versions together; they must be" 2>&1
+			echo "       consistent!" 2>&1
+			exit 1
+		fi
 	else
-		COMMON_BRANCH=dev
+		echo "Fetching \"${COMMON_USER}/common/${BRANCH}\"..."
+		wget --no-check-certificate -q -O ${COMMON_USER}-common-${BRANCH}.tgz https://github.com/${COMMON_USER}/common/archive/${BRANCH}.tar.gz
+		if [ "$?" != 0 ]; then
+			echo "Fetch of \"${COMMON_USER}/common/${BRANCH}\" failed. Are you sure it exists?" 1>&2
+			rm -f ${COMMON_USER}-common-${BRANCH}.tgz
+			exit 1
+		fi
+		echo "Uncompressing \"${COMMON_USER}/common/${BRANCH}\" into \"${TOPDIR}/common\" directory..."
+		tar zxf ${COMMON_USER}-common-${BRANCH}.tgz
+		echo ${BRANCH} > common-${BRANCH}/.branch
+		mv common-${BRANCH} ${TOPDIR}/common
+		rm -f ${COMMON_USER}-common-${BRANCH}.tgz
 	fi
-	if [ "${COMMON_BRANCH}" != "${BRANCH}" ]; then
-		echo
-		echo "ERROR: A \"${TOPDIR}/common\" directory exists, but it's on the ${COMMON_BRANCH} branch. You" 2>&1
-		echo "       should not try to mix different versions together; they must be" 2>&1
-		echo "       consistent!" 2>&1
-		exit 1
-	fi
-else
-	echo "Fetching \"makestuff/common/${BRANCH}\"..."
-	wget --no-check-certificate -q -O makestuff-common-${BRANCH}.tgz https://github.com/makestuff/common/archive/${BRANCH}.tar.gz
-	if [ "$?" != 0 ]; then
-		echo "Fetch of \"makestuff/common/${BRANCH}\" failed. Are you sure it exists?" 1>&2
-		rm -f makestuff-common-${BRANCH}.tgz
-		exit 1
-	fi
-	echo "Uncompressing \"makestuff/common/${BRANCH}\" into \"${TOPDIR}/common\" directory..."
-	tar zxf makestuff-common-${BRANCH}.tgz
-	echo ${BRANCH} > common-${BRANCH}/.branch
-	mv common-${BRANCH} ${TOPDIR}/common
-	rm -f makestuff-common-${BRANCH}.tgz
 fi
