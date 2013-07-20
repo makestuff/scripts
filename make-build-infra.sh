@@ -67,19 +67,35 @@ else
   # We're in WOW64 so this is probably an x86_64 system
   export HOSTTYPE=x64
 fi
+if [ -z "\${MACHINE}" ]; then
+  echo "You need to set MACHINE to x86 or x64; see C:\\\\makestuff\\\\README.txt"
+fi
 export PATH="/bin:.:\$PATH"
 export PS1="\${USERNAME}@\${HOSTNAME}\$ "
+export HOME=/c/makestuff
+alias e="\${HOME}/msys/emacs-24.3/bin/emacs -nw"
 EOF
 cat > ../scripts/getvim.sh <<EOF
 mkdir vim
 cd vim
-wget -q 'http://prdownloads.sourceforge.net/mingw/vim-7.3-2-msys-1.0.16-bin.tar.lzma?download'
+wget 'http://prdownloads.sourceforge.net/mingw/vim-7.3-2-msys-1.0.16-bin.tar.lzma?download'
 7za.exe x -so vim-7.3-2-msys-1.0.16-bin.tar.lzma | tar xf -
 mv bin/vim.exe /bin/
 cd ..
 rm -rf vim
 EOF
 chmod +x ../scripts/getvim.sh
+
+cat > ../scripts/getemacs.sh <<EOF
+mkdir emacs
+cd emacs
+wget 'http://mirror.switch.ch/ftp/mirror/gnu/windows/emacs/emacs-24.3-bin-i386.zip'
+unzip emacs-24.3-bin-i386.zip
+mv emacs-24.3 \${HOME}/msys/
+cd ..
+rm -rf emacs
+EOF
+chmod +x ../scripts/getemacs.sh
 
 export MAIN_README=$(mktemp --tmpdir=/var/tmp)
 
@@ -161,27 +177,24 @@ make-build-infra.sh script on a GNU-like machine:
   https://github.com/makestuff/scripts/raw/master/make-build-infra.sh
 
 To use, you should unpack the "makestuff" directory to C:/ and make a desktop
-shortcut to the shell interpreter:
-
-  C:\makestuff\msys\bin\sh.exe --login
-
-In practice you will want to edit C:\makestuff\msys\etc\profile to setup a
-suitable environment. You will also want to run the Visual Studio command-line
-script to pick up the MSVC compiler and tools:
+shortcut to the shell interpreter which first sets up the environment to pick up
+the MSVC compiler and tools:
 
   %comspec% /c "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86 && set MACHINE=x86 && C:\makestuff\msys\bin\sh.exe --login
 
-Obviously the name and exact path to vcvarsall.bat will differ from system to
-system. You can usually pass a parameter to the vcvarsall.bat script to choose
-a 64-bit compiler:
+That will give you a compiler capable of generating x86 (32-bit) code. You can
+usually pass a parameter to the vcvarsall.bat script to choose a 64-bit
+compiler instead:
 
   %comspec% /c "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86_amd64 && set MACHINE=x64 && C:\makestuff\msys\bin\sh.exe --login
 
-You can find details here:
+See http://msdn.microsoft.com/en-us/library/vstudio/x4d2c09s.aspx for details.
+Obviously the name and exact path to vcvarsall.bat will differ depending on the
+version of Visual Studio you have installed. I have tested it with 2010, 2012
+and 2013.
 
-  http://msdn.microsoft.com/en-us/library/vstudio/x4d2c09s.aspx
-
-If you need a text editor, you can run /c/makestuff/scripts/getvim.sh.
+If you need a text editor, you can run /c/makestuff/scripts/getvim.sh or
+/c/makestuff/scripts/getemacs.sh.
 EOF
 unix2dos ../README.txt
 
@@ -191,6 +204,7 @@ cp unpack/bin/bzip2.exe ../msys/bin/
 cp unpack/bin/cat.exe ../msys/bin/
 cp unpack/bin/cmp.exe ../msys/bin/
 cp unpack/bin/cp.exe ../msys/bin/
+cp unpack/bin/date.exe ../msys/bin/
 cp unpack/bin/dd.exe ../msys/bin/
 cp unpack/bin/diff.exe ../msys/bin/
 cp unpack/bin/dirname.exe ../msys/bin/
