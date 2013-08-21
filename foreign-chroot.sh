@@ -80,7 +80,7 @@ cat <<EOF | sudo tee /usr/local/bin/qemu-chroot.sh > /dev/null
 #!/bin/sh
 
 usage() {
-  echo "Synopsis: qemu-chroot.sh <armel|armhf|powerpc> [<command to run in chroot>]"
+  echo "Synopsis: qemu-chroot.sh [-r] <armel|armhf|powerpc> [<command to run in chroot>]"
   echo "  -r  retain root privileges inside chroot"
   exit 1
 }
