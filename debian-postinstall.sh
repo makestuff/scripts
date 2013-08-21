@@ -21,6 +21,24 @@
 # common libraries. Tailor it to your needs. 
 # ------------------------------------------------------------------------------
 #
+# Add aliases and ABI-sensitive prompt:
+cat >> ${HOME}/.bash_aliases <<EOF
+alias h=history
+alias e=emacs
+ABI=\$(gcc -dumpmachine)
+if [ "\${ABI}" = "x86_64-linux-gnu" ]; then
+  export PS1="\${USER}@x64\\\$ "
+elif [ "\${ABI}" = "arm-linux-gnueabihf" ]; then
+  export PS1="\${USER}@armhf\\\$ "
+elif [ "\${ABI}" = "arm-linux-gnueabi" ]; then
+  export PS1="\${USER}@armel\\\$ "
+elif [ "\${ABI}" = "powerpc-linux-gnu" ]; then
+  export PS1="\${USER}@ppc\\\$ "
+else
+  export PS1="\${USER}@unknown\\\$ "
+fi
+EOF
+
 # Add VirtualBox shared folder to fstab, and mount it
 cat <<EOF | sudo tee -a /etc/fstab > /dev/null
 # VirtualBox shared folder
@@ -31,7 +49,7 @@ sudo mount /mnt/${USER}
 # Install build tools for x86 and x64
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt-get install -y build-essential g++-multilib libusb-1.0-0-dev libreadline6-dev
+sudo apt-get install -y emacs23-nox build-essential g++-multilib libusb-1.0-0-dev libreadline6-dev
 sudo apt-get install -y libc6-dev-i386 libusb-1.0-0:i386 libreadline6:i386
 cd /usr/lib/i386-linux-gnu/
 sudo ln -s /lib/i386-linux-gnu/libusb-1.0.so.0 libusb-1.0.so
