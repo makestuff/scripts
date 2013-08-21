@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Copyright (C) 2013 Chris McClelland
 #
@@ -14,8 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#!/usr/bin/env python
-
 import json, base64, httplib, codecs, sys
 from os.path import expanduser
 

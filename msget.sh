@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Copyright (C) 2012-2013 Chris McClelland
 #
@@ -14,44 +15,54 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#!/bin/bash
-
-function usage {
-	echo "Synopsis: $0 <user>/<repo>[/<branch>]" 1>&2
+usage() {
+	echo "Synopsis: $0 [-d <depend-branch>] <user>/<repo>[/<branch>]" 1>&2
 	echo "  <user>   - the github.com user (required)" 1>&2
 	echo "  <repo>   - the github.com repository (required)" 1>&2
-	echo "  <branch> - the git branch to fetch (default: master)" 1>&2
+	echo "  <branch> - the git branch to fetch (default: master/common)" 1>&2
 	exit 1
 }
 
 unset DEPEND_BRANCH
-
-while [ "${1:0:1}" == "-" ]; do
-  OPT=${1:1}
-  case $OPT in
-    d) shift; DEPEND_BRANCH=$1; shift;;
-    *) usage;;
-  esac
+while getopts d: OPT; do
+	case "$OPT" in
+		d)
+			DEPEND_BRANCH=$OPTARG
+			;;
+	esac
 done
+shift $(($OPTIND - 1))
 
 if [ $# -ne 1 ]; then
 	usage
 fi
 
+TOPDIR=$(dirname $(dirname $0))
+if [ -e ${TOPDIR}/common ]; then
+	if [ -e ${TOPDIR}/common/.branch ]; then
+		# The common dir has a .branch - use it as default
+		DEFAULT_BRANCH=$(cat ${TOPDIR}/common/.branch)
+	else
+		# The common dir has no branch; it's probably a local .git repo, so default to dev
+		DEFAULT_BRANCH=dev
+	fi
+else
+	# There is no common dir yet, so we're just getting started - default to master
+	DEFAULT_BRANCH=master
+fi
 COMMON_USER=makestuff
 OLDIFS=${IFS}
 IFS='/'
-TOKENS=($1)
+set -- $1
 IFS=${OLDIFS}
-NUMTOK=${#TOKENS[@]}
-if [ "$NUMTOK" == "2" ]; then
-	USER=${TOKENS[0]}
-	REPO=${TOKENS[1]}
-	BRANCH=master
-elif [ "$NUMTOK" == "3" ]; then
-	USER=${TOKENS[0]}
-	REPO=${TOKENS[1]}
-	BRANCH=${TOKENS[2]}
+if [ "$#" -eq "2" ]; then
+	USER=$1
+	REPO=$2
+	BRANCH=${DEFAULT_BRANCH}
+elif [ "$#" -eq "3" ]; then
+	USER=$1
+	REPO=$2
+	BRANCH=$3
 else
 	usage
 fi
@@ -80,16 +91,10 @@ fi
 echo ${BRANCH} > ${REPO}/.branch
 
 if [ "${USER}" != "${COMMON_USER}" -o "${REPO}" != "common" ]; then
-	TOPDIR=$(dirname $(dirname $0))
 	if [ -e ${TOPDIR}/common ]; then
-		if [ -e ${TOPDIR}/common/.branch ]; then
-			COMMON_BRANCH=$(cat ${TOPDIR}/common/.branch)
-		else
-			COMMON_BRANCH=dev
-		fi
-		if [ "${COMMON_BRANCH}" != "${BRANCH}" ]; then
+		if [ "${DEFAULT_BRANCH}" != "${BRANCH}" ]; then
 			echo
-			echo "ERROR: A \"${TOPDIR}/common\" directory exists, but it's on the ${COMMON_BRANCH} branch. You" 2>&1
+			echo "ERROR: A \"${TOPDIR}/common\" directory exists, but it's on the ${DEFAULT_BRANCH} branch. You" 2>&1
 			echo "       should not try to mix different versions together; they must be" 2>&1
 			echo "       consistent!" 2>&1
 			exit 1

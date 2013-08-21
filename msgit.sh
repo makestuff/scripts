@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Copyright (C) 2012-2013 Chris McClelland
 #
@@ -14,13 +15,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#!/bin/bash
-
-function usage {
+usage() {
 	echo "Synopsis: $0 <user>/<repo>[/<branch>]" 1>&2
 	echo "  <user>   - the github.com user (required)" 1>&2
 	echo "  <repo>   - the github.com repository (required)" 1>&2
-	echo "  <branch> - the git branch to fetch (default: \"${BRANCH}\")" 1>&2
+	echo "  <branch> - the git branch to fetch (default: dev)" 1>&2
 	exit 1
 }
 
@@ -30,17 +29,16 @@ fi
 
 OLDIFS=${IFS}
 IFS='/'
-TOKENS=($1)
+set -- $1
 IFS=${OLDIFS}
-NUMTOK=${#TOKENS[@]}
-if [ "$NUMTOK" == "2" ]; then
-	USER=${TOKENS[0]}
-	REPO=${TOKENS[1]}
+if [ "$#" -eq "2" ]; then
+	USER=$1
+	REPO=$2
 	BRANCH=dev
-elif [ "$NUMTOK" == "3" ]; then
-	USER=${TOKENS[0]}
-	REPO=${TOKENS[1]}
-	BRANCH=${TOKENS[2]}
+elif [ "$#" -eq "3" ]; then
+	USER=$1
+	REPO=$2
+	BRANCH=$3
 else
 	usage
 fi
