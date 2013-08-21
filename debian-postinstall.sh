@@ -40,6 +40,7 @@ fi
 EOF
 
 # Add VirtualBox shared folder to fstab, and mount it
+sudo mkdir -p /mnt/${USER}
 cat <<EOF | sudo tee -a /etc/fstab > /dev/null
 # VirtualBox shared folder
 ${USER} /mnt/${USER} vboxsf auto,rw,uid=$(id -u),gid=$(id -g) 0 0
