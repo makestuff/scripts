@@ -29,12 +29,11 @@ if ( $#ARGV != 1 ) {
 undef $/;
 my $header = $ARGV[0];
 my $htmlDir = $ARGV[1];
-my $tempDir = tempdir("/tmp/XXXXXXX", CLEANUP => 1);
+my $tempDir = tempdir("/var/www/XXXXXXX", CLEANUP => 0);
 my $thisDir = getcwd;
 my ($file, $baseName, $docFile, $srcFile, $desc);
 
-# Copy Doxyfile over
-copy("${Bin}/Doxyfile", "${tempDir}/Doxyfile") or die "Copy failed: $!";
+print "$tempDir\n";
 
 # Copy header file, stripping DLLEXPORT and WARN_UNUSED_RESULT
 open FILE, ${header} or die "Cannot open file";
@@ -47,16 +46,33 @@ print FILE $file;
 close FILE;
 
 chdir(${tempDir});
-system("${Bin}/doxygen-*/bin/doxygen");
-$baseName = basename(${header}, ".h")."_8h";
+($baseName, $ext) = split(/\./, ${header}, 2);
+if ( $ext eq "h" ) {
+	copy("${Bin}/Doxyfile.h", "${tempDir}/Doxyfile") or die "Copy failed: $!";
+	$baseName = ${baseName}."_8h";
+} elsif ( $ext eq "py" ) {
+	copy("${Bin}/Doxyfile.py", "${tempDir}/Doxyfile") or die "Copy failed: $!";
+	$baseName = "namespace".${baseName};
+}
 $docFile = "${tempDir}/html/${baseName}.html";
 $srcFile = "${tempDir}/html/${baseName}_source.html";
+
+# Actually run DoxyGen
+system("${Bin}/doxygen-*/bin/doxygen");
+
 chdir(${thisDir});
+
+print "BLAH:".$baseName."\n";
+#exit(0);
 
 open FILE, ${docFile} or die "Cannot open file";
 $file = <FILE>;
 close FILE;
 
+$file =~ s/<tr><td class=\"memItemLeft\".*?href=\"struct.*?<\/tr>\n//ims;
+$file =~ s/<p>.*?href=\"#details\">More...<\/a><\/p>\n//ims;
+$file =~ s/<div class=\"summary\">(.*?)<\/div>\n//ims;
+$file =~ s/<tr>[^\n]*?name=\"nested-classes\".*?<\/tr>\n//ims;
 $file =~ s/<tr>[^\n]*?name=\"enum-members\".*?<\/tr>\n//ims;
 $file =~ s/<tr>[^\n]*?name=\"func-members\".*?<\/tr>\n//ims;
 $file =~ s/<hr\/>[^\n]*?<h2>Detailed Description<\/h2>\n(.*?<\/div>)//ims;
@@ -64,12 +80,19 @@ $desc = ${1};
 $file =~ s/<table class="memberdecls">/${desc}\n<hr\/><h2>Overview<\/h2>\n<table class="memberdecls">/ims;
 $file =~ s/<td class="paramtype">void&#160;<\/td>/<td class="paramtype">void<\/td>/ims;
 $file =~ s/<h2><a name="define-members"><\/a>\nDefines<\/h2>/<div class="groupHeader">Defines<\/div>/ims;
+$file =~ s/<\/address>/<\/address>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><br\/>\n/ims;
 
 open FILE, ">${htmlDir}/${baseName}.html" or die "Cannot open file";
 print FILE ${file};
 close FILE;
 
-copy("${srcFile}", "${htmlDir}/") or die "Copy failed: $!";
+print ${srcFile}."\n";
+
+copy("${srcFile}", "${htmlDir}/"); # or die "Copy failed: $!";
 copy("${tempDir}/html/doxygen.css", "${htmlDir}/") or die "Copy failed: $!";
 copy("${tempDir}/html/doxygen.png", "${htmlDir}/") or die "Copy failed: $!";
 copy("${tempDir}/html/tabs.css", "${htmlDir}/") or die "Copy failed: $!";
+my @structs = glob "${tempDir}/html/struct*.html";
+foreach my $struct (@structs) {
+	copy($struct, "${htmlDir}/") or die "Copy failed: $!";
+}

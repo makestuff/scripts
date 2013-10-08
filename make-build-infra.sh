@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2009-2012 Chris McClelland
+# Copyright (C) 2009-2013 Chris McClelland
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -62,21 +62,12 @@ unzip ../7za920.zip
 for i in ../*.tar.lzma*; do tar --lzma -xf $i; done
 cd ..
 cat > ../msys/etc/profile <<EOF
-if [ \${PROCESSOR_ARCHITEW6432:-null} = null ]; then
-  # We're not in WOW64 so this is probably an x86 system
-  export HOSTTYPE=x86
-else
-  # We're in WOW64 so this is probably an x86_64 system
-  export HOSTTYPE=x64
-fi
-if [ -z "\${MACHINE}" ]; then
-  echo "You need to set MACHINE to x86 or x64; see C:\\\\makestuff\\\\README.txt"
-fi
 export PATH="/bin:.:\$PATH"
 export PS1="\${USERNAME}@\${HOSTNAME}\$ "
 export HOME=/c/makestuff
 alias e="\${HOME}/msys/emacs-24.3/bin/emacs -nw"
 alias h="history"
+cd \${HOME}
 EOF
 
 cat > ../scripts/getvim.sh <<EOF
@@ -100,6 +91,8 @@ mv emacs-24.3 \${HOME}/msys/
 cd ..
 rm -rf emacs
 cat > ~/.emacs <<EOF
+;;(global-font-lock-mode 0)
+(setq w32-get-true-file-attributes nil)
 (set-language-environment "UTF-8")
 (setq-default indent-tabs-mode 0);
 (setq default-truncate-lines 1)
@@ -246,128 +239,29 @@ unix2dos ../README.txt
 cat > ../INSTALL.txt <<EOFINSTALL
 --------------------------- WINDOWS MSYS ENVIRONMENT ---------------------------
 
-To use, you should unpack the "makestuff" directory to C:/ and make a desktop
-shortcut using this line as a target:
+To use, you should unpack the "makestuff" directory to C:/ and run setup.exe.
+That will give you a dialog box which allows you to choose the tools you wish to
+use, and create a shortcut on your desktop. You don't HAVE to choose any extra
+software, but you will probably either want to use the build infrastructure for
+building C or C++ code, or for building HDL code.
 
-  C:\makestuff\msys\bin\bash.exe --login
+* For building C/C++ code you will need to choose an MSVC compiler. The minimum
+  is to install the Windows SDK v7.1, but that will only give you command-line
+  compilers, not a full Integrated Development Environment: for that you'll need
+  to install the much bigger Visual Studio. The setup utility will give you
+  download links for various options.
 
-That will give you a shell prompt, but on its own it's not much use. What you do
-next depends on what you want to use the build infrastructure for.
+* For building HDL code you'll need Python with PyYAML and a Xilinx ISE
+  installation. The setup utility will give you download links for various
+  options.
 
-If you need a text editor, you can run $HOME/scripts/getvim.sh or
+Once you're happy with your choices, review the "Shortcut Name" to verify that
+it meets your approval, and then click "Create Shortcut". It will create a
+shortcut on your desktop which will start a console window with the chosen
+tools on the PATH.
+
+If you need an in-console text editor, you can run $HOME/scripts/getvim.sh or
 $HOME/scripts/getemacs.sh to download and install Vim or Emacs.
-
-
----------------- COMPILING C/C++ CODE (VISUAL STUDIO INSTALLED) ----------------
-
-If you already have Microsoft Visual Studio installed (2010, 2012 or 2013,
-Express editions are fine), you first need to find the location of the
-vcvarsall.bat script. Find the shortcut called "Visual Studio Command Prompt" in
-your start menu, right-click it and select Properties, then make a note of the
-full path to vcvarsall.bat, in the "Target" box.
-
-If your OS is a 32-bit (x86) version of Windows, you will only be able to make
-32-bit executables. Create a desktop shortcut with this line for a target,
-replacing the the path to vcvarsall.bat with the actual path on your system:
-
-  %comspec% /c "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86 && set MACHINE=x86 && C:\makestuff\msys\bin\bash.exe --login
-
-You may find it helpful to enter "C:\makestuff" in the "Start in" box, and to
-check "QuickEdit mode" on the "Options" pane.
-
-If your OS is a 64-bit (x64) version of Windows, you can go ahead and create a
-32-bit (x86) command-prompt as above, but you'll also have the additional option
-of creating a 64-bit (x64) command-prompt, or both. Again, make a shortcut
-using this line for a target, replacing the path to vcvarsall.bat with the
-actual path from your system:
-
-  %comspec% /c "C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86_amd64 && set MACHINE=x64 && C:\makestuff\msys\bin\bash.exe --login
-
-Again, select start in "C:\makestuff", and enable QuickEdit.
-
-
--------------- COMPILING C/C++ CODE (VISUAL STUDIO NOT INSTALLED) --------------
-
-Visual Studio is a large download. Since all we need is the command-line tools,
-you can get away with just the Windows SDK, which is rather smaller:
-
-http://www.microsoft.com/en-gb/download/details.aspx?id=8279
-
-Unfortunately 7.1 is the last version of the SDK which does include the command-
-line tools, so if you need more recent tools you must install the full Visual
-Studio.
-
-After the install completes, find the shortcut in your start menu named "Windows
-SDK 7.1 Command Prompt", right-click it and select "Properties", then make a
-note of the full path to SetEnv.cmd, in the "Target" box.
-
-If your OS is a 32-bit (x86) version of Windows, you will only be able to make
-32-bit executables. Create a desktop shortcut with this line for a target,
-replacing the the path to SetEnv.bat with the actual path on your system:
-
-  %comspec% /c "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.bat" /x86 && set MACHINE=x86 && C:\makestuff\msys\bin\bash.exe --login
-
-You may find it helpful to enter "C:\makestuff" in the "Start in" box, and to
-check "QuickEdit mode" on the "Options" pane.
-
-If your OS is a 64-bit (x64) version of Windows, you can go ahead and create a
-32-bit (x86) command-prompt as above, but you'll also have the additional option
-of creating a 64-bit (x64) command-prompt, or both. Again, make a shortcut
-using this line for a target, replacing the path to SetEnv.bat with the actual
-path from your system:
-
-  %comspec% /c "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.bat" /x64 && set MACHINE=x64 && C:\makestuff\msys\bin\bash.exe --login
-
-Again, select start in "C:\makestuff", and enable QuickEdit.
-
-
----------------- SYNTHESIZING HDL CODE WITH XILINX ISE WEBPACK -----------------
-
-Compiling HDL code (VHDL or Verilog) into an FPGA config file involves several
-steps which are usually performed by the ISE GUI. But getting repeatable builds
-from many HDL files with slightly different config parameters for different FPGA
-boards is error-prone. To get more repeatable builds, you can use a small Python
-script called hdlmake.py (replace 20130812 here with the branch/tag of your
-choice):
-
-  cd $HOME
-  scripts/msget.sh makestuff/hdlmake/20130812
-
-To run it you'll need to install Python 2.7:
-
-  http://www.python.org/ftp/python/2.7.5/python-2.7.5.msi (for 32-bit)
-  http://www.python.org/ftp/python/2.7.5/python-2.7.5.amd64.msi (for 64-bit)
-
-When you install, choose "install for me only". Next, install PyYAML:
-
-  http://pyyaml.org/download/pyyaml/PyYAML-3.10.win32-py2.7.exe 
-
-Finally, add the Xilinx tools and Python itself to the system PATH. You can
-easily do this by adding some commands to /etc/profile, which is executed when
-you open a new console window. Copy and paste these commands into a console
-window, replacing "14.4" with the actual version of Xilinx ISE you have:
-
-cat >> /etc/profile <<EOF
-ISE_VER=14.4
-if [ "\\\${HOSTTYPE}" = "x86" ]; then
-  export PATH=\\\${PATH}:/c/Xilinx/\\\${ISE_VER}/ISE_DS/ISE/bin/nt
-else
-  export PATH=\\\${PATH}:/c/Xilinx/\\\${ISE_VER}/ISE_DS/ISE/bin/nt64 
-fi
-export PATH=\\\${PATH}:/c/Python27
-export PATH=\\\${PATH}:\\\${HOME}/hdlmake/bin
-EOF
-
-Once installed, you can now use hdlmake.py to fetch and build HDL code, e.g:
-
-  cd $HOME/hdlmake/apps
-  hdlmake.py -g makestuff/swled
-  cd makestuff/swled/cksum/vhdl
-  hdlmake.py -t ../../templates/fx2all/vhdl -b nexys2-1200 -p fpga prom
-
-That fetches and builds the VHDL version of the FPGALink cksum example,
-generating a pair of .xsvf files suitable for loading into the FPGA and flash
-PROM of a Nexys2 (1200K version) board.
 EOFINSTALL
 unix2dos ../INSTALL.txt
 
@@ -418,6 +312,7 @@ rm -rf all
 
 # Make other top-level directories
 cp ../msg*.sh scripts/
+wget -q https://dl.dropboxusercontent.com/u/80983693/setup.exe
 cd ..
 
 # Zip Windows build and publish it:
@@ -426,7 +321,9 @@ mv makestuff-windows-${DATE}.zip ${PUBDIR}
 
 # Remove Windows-only msys dir, zip remainder and publish:
 rm -rf makestuff/msys
+rm -f makestuff/setup.exe
 rm -f makestuff/README.txt
+rm -f makestuff/INSTALL.txt
 cat $MAIN_README | sed 's/NATIVE_LOC/\$HOME\/makestuff/g;s/UNIX_LOC/\$HOME\/makestuff/g' > makestuff/README
 rm -f makestuff/scripts/getvim.sh
 tar zcf makestuff-lindar-${DATE}.tar.gz makestuff
