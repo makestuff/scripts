@@ -29,11 +29,9 @@ if ( $#ARGV != 1 ) {
 undef $/;
 my $header = $ARGV[0];
 my $htmlDir = $ARGV[1];
-my $tempDir = tempdir("/var/www/XXXXXXX", CLEANUP => 0);
+my $tempDir = tempdir("/var/tmp/XXXXXXX", CLEANUP => 1);
 my $thisDir = getcwd;
 my ($file, $baseName, $docFile, $srcFile, $desc);
-
-print "$tempDir\n";
 
 # Copy header file, stripping DLLEXPORT and WARN_UNUSED_RESULT
 open FILE, ${header} or die "Cannot open file";
@@ -82,8 +80,6 @@ $file =~ s/<\/address>/<\/address>\n<br\/><br\/><br\/><br\/><br\/><br\/><br\/><b
 open FILE, ">${htmlDir}/${baseName}.html" or die "Cannot open file";
 print FILE ${file};
 close FILE;
-
-print ${srcFile}."\n";
 
 copy("${srcFile}", "${htmlDir}/"); # or die "Copy failed: $!";
 copy("${tempDir}/html/doxygen.css", "${htmlDir}/") or die "Copy failed: $!";
