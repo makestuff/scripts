@@ -62,9 +62,6 @@ system("${Bin}/doxygen-*/bin/doxygen");
 
 chdir(${thisDir});
 
-print "BLAH:".$baseName."\n";
-#exit(0);
-
 open FILE, ${docFile} or die "Cannot open file";
 $file = <FILE>;
 close FILE;
