@@ -62,10 +62,10 @@ unzip ../7za920.zip
 for i in ../*.tar.lzma*; do tar --lzma -xf $i; done
 cd ..
 cat > ../msys/etc/profile <<EOF
-export PATH="/bin:.:\$PATH"
-export PS1="\${USERNAME}@\${HOSTNAME}\$ "
 export HOME=/c/makestuff
-alias e="\${HOME}/msys/emacs-24.3/bin/emacs -nw"
+export PATH="\${HOME}/scripts:/bin:.:\$PATH"
+export PS1="\${USERNAME}@\${HOSTNAME}\$ "
+alias e="\${HOME}/3rd/emacs-24.3/bin/emacs -nw"
 alias h="history"
 cd \${HOME}
 EOF
@@ -87,7 +87,7 @@ mkdir emacs
 cd emacs
 wget 'http://mirror.switch.ch/ftp/mirror/gnu/windows/emacs/emacs-24.3-bin-i386.zip'
 unzip emacs-24.3-bin-i386.zip
-mv emacs-24.3 \${HOME}/msys/
+mv emacs-24.3 \${HOME}/3rd/
 cd ..
 rm -rf emacs
 cat > ~/.emacs <<EOF

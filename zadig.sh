@@ -1,10 +1,10 @@
 #!/bin/sh
-
-if [ ! -e /bin/zadig.exe ]; then
+export ZADIG=${HOME}/3rd/zadig.exe
+if [ ! -e ${ZADIG} ]; then
     export URL=http://zadig.akeo.ie/downloads/zadig_v2.0.1.161.exe
     echo "Downloading zadig.exe from ${URL}..."
-    wget -qO /bin/zadig.exe ${URL}
+    wget -qO ${ZADIG} ${URL}
 fi
 echo "Launching zadig.exe..."
-cmd //c /bin/zadig.exe
+cmd //c ${ZADIG}
 echo "Done!"
