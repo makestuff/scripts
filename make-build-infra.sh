@@ -260,8 +260,8 @@ it meets your approval, and then click "Create Shortcut". It will create a
 shortcut on your desktop which will start a console window with the chosen
 tools on the PATH.
 
-If you need an in-console text editor, you can run $HOME/scripts/getvim.sh or
-$HOME/scripts/getemacs.sh to download and install Vim or Emacs.
+If you need an in-console text editor, you can run getvim.sh or getemacs.sh to
+download and install Vim or Emacs.
 EOFINSTALL
 unix2dos ../INSTALL.txt
 
