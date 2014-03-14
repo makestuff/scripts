@@ -266,6 +266,7 @@ EOFINSTALL
 unix2dos ../INSTALL.txt
 
 cp unpack/7za.exe ../msys/bin/
+cp unpack/bin/basename.exe ../msys/bin/
 cp unpack/bin/bunzip2.exe ../msys/bin/
 cp unpack/bin/bzip2.exe ../msys/bin/
 cp unpack/bin/cat.exe ../msys/bin/
