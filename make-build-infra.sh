@@ -282,6 +282,7 @@ cp unpack/bin/find.exe ../msys/bin/
 cp unpack/bin/grep.exe ../msys/bin/
 cp unpack/bin/gunzip ../msys/bin/
 cp unpack/bin/gzip.exe ../msys/bin/
+cp unpack/bin/head.exe ../msys/bin/
 cp unpack/bin/ls.exe ../msys/bin/
 cp unpack/bin/make.exe ../msys/bin/
 cp unpack/bin/mkdir.exe ../msys/bin/
