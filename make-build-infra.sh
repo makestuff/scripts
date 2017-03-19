@@ -314,7 +314,7 @@ rm -rf all
 
 # Make other top-level directories
 cp ../msg*.sh ../zadig.sh ../getavr.sh ../getgcc.sh scripts/
-wget -q https://dl.dropboxusercontent.com/u/80983693/setup.exe
+wget -qO setup.exe http://tiny.cc/ms-setup
 cd ..
 
 # Zip Windows build and publish it:

@@ -4,7 +4,7 @@ wget http://cznic.dl.sourceforge.net/project/mobilechessboar/avr-gcc%20snapshots
 unzip avr-gcc-4.8_2013-03-06_mingw32.zip
 mv avr-gcc-4.8_2013-03-06_mingw32 avr-gcc
 cd avr-gcc/bin
-wget --no-check-certificate https://dl.dropboxusercontent.com/u/80983693/dfu-programmer.exe
+wget --no-check-certificate -qO dfu-programmer.exe http://tiny.cc/dfu-prog
 echo 'You can now add ${HOME}/3rd/avr-gcc/bin to your path and start compiling:'
 echo
 echo '$ export PATH=${PATH}:${HOME}/3rd/avr-gcc/bin'
